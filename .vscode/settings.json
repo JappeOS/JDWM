@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "wlr_input_device.h": "c",
+        "wlr_seat.h": "c",
+        "wlr_xcursor_manager.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

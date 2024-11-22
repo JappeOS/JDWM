@@ -28,7 +28,6 @@ class WindowContent extends StatefulWidget {
 class _WindowContentState extends State<WindowContent> {
   @override
   Widget build(BuildContext context) {
-    print(" --- Window Contents Rebuilt!!!"); // TODO: Remove print
     return widget.texture != null ? Image.memory(widget.texture!, fit: BoxFit.fill) : const Placeholder();
   }
 }

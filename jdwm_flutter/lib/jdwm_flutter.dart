@@ -33,6 +33,5 @@ part 'base/window.dart';
   widgets
 */
 part 'widgets/window_content.dart';
-part 'widgets/window_header.dart';
 part 'widgets/window_stack.dart';
 part 'widgets/window_widget.dart';

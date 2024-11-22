@@ -18,36 +18,12 @@ part of jdwm_flutter;
 
 class WindowWidget extends StatefulWidget {
   final WindowContent content;
-
-  final BackgroundMode windowBackgroundMode;
-  final bool windowIsFocused;
-  final bool windowIsResizable;
-  final Vector2 windowPos;
-  final Vector2 windowMinSize;
-  final Vector2 windowSize;
-  final WindowState windowState;
-
-  final Function(bool newVal) focusCallback;
-  final Function(Vector2 newVal) resizeCallback;
-  final Function(Vector2 newVal) posCallback;
-  final Function(WindowState newVal) stateCallback;
-  final Function() closeCallback;
+  final Window window;
 
   const WindowWidget(
       {Key? key,
       required this.content,
-      required this.windowBackgroundMode,
-      required this.windowIsFocused,
-      required this.windowIsResizable,
-      required this.windowPos,
-      required this.windowMinSize,
-      required this.windowSize,
-      required this.windowState,
-      required this.focusCallback,
-      required this.resizeCallback,
-      required this.posCallback,
-      required this.stateCallback,
-      required this.closeCallback})
+      required this.window})
       : super(key: key);
 
   @override
@@ -60,41 +36,88 @@ class _WindowWidgetState extends State<WindowWidget> {
   Vector2 oldWindowPos = Vector2.zero();
   Vector2 oldWindowSize = Vector2.zero();
   Offset? _dragOffset;
+  bool _freeDrag = false;
 
   @override
   Widget build(BuildContext context) {
-    WindowHeader header = WindowHeader(
-        maximizeButton: widget.windowIsResizable,
-        windowPos: widget.windowPos,
-        windowState: widget.windowState,
-        focusCallback: widget.focusCallback,
-        posCallback: widget.posCallback,
-        stateCallback: widget.stateCallback,
-        closeCallback: widget.closeCallback);
+    //WindowHeader header = WindowHeader(
+    //    maximizeButton: widget.windowIsResizable,
+    //    windowPos: widget.windowPos,
+    //    windowState: widget.windowState,
+    //    focusCallback: widget.focusCallback,
+    //    posCallback: widget.posCallback,
+    //    stateCallback: widget.stateCallback,
+    //    closeCallback: widget.closeCallback);
+
+    Widget header() => ShadeHeaderBar(
+      title: widget.window.title,
+      backgroundColor: Colors.transparent,
+      isActive: widget.window.isFocused,
+      isClosable: true,
+      isDraggable: true,
+      isMaximizable: widget.window.state == WindowState.normal,
+      isMinimizable: true,
+      isRestorable: widget.window.state != WindowState.normal,
+      onClose: (_) => widget.window._close(),
+      onDrag: (_, p) {
+        _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
+
+        if ((_dragOffset!.dx.abs() < 10 && _dragOffset!.dy.abs() < 10) && !_freeDrag) {
+          return;
+        }
+
+        _freeDrag = true;
+
+        widget.window.setPos(Vector2(
+          oldWindowPos.x + _dragOffset!.dx,
+          oldWindowPos.y + _dragOffset!.dy,
+        ));
+      },
+      onDragStart: (_) {
+        _dragOffset = Offset.zero;
+        oldWindowPos = widget.window.pos;
+        _freeDrag = false;
+        widget.window.setFocus(true);
+      },
+      onDragEnd: (_) {
+        _dragOffset = null;
+        oldWindowPos = Vector2.zero();
+        _freeDrag = false;
+
+        if (widget.window.pos.y < -5) {
+          widget.window.setPos(Vector2(widget.window.pos.x, 0));
+        }
+      },
+      onMaximize: (_) => widget.window.setState(WindowState.maximized),
+      onMinimize: (_) => widget.window.setState(WindowState.minimized),
+      onRestore: (_) => widget.window.setState(WindowState.normal),
+      // TODO: onShowMenu
+    );
 
     // The window base widget, anything can be added on top later on
     Widget base(Widget child) {
-      if (widget.windowBackgroundMode == BackgroundMode.blurredTransp) {
+      final borderRadius = widget.window.state == WindowState.normal ? BPPresets.medium : 0.0;
+      final borderStyle = widget.window.state == WindowState.normal ? ShadeContainerBorder.double : ShadeContainerBorder.none;
+
+      if (widget.window.bgRenderMode == BackgroundMode.blurredTransp) {
         // Blurred window background
-        return AdvancedContainer(
-          background: AdvancedContainerBackground.transparentBackground,
-          borderRadius: BPPresets.medium,
-          borderStyle: AdvancedContainerBorder.double,
-          blur: true,
+        return ShadeContainer.transparent(
+          borderRadius: borderRadius,
+          border: borderStyle,
+          backgroundBlur: true,
           child: child,
         );
       } else {
         // Solid window background
-        return AdvancedContainer(
-          background: AdvancedContainerBackground.solidBackground,
-          borderRadius: BPPresets.medium,
-          borderStyle: AdvancedContainerBorder.double,
+        return ShadeContainer.solid(
+          borderRadius: borderRadius,
+          border: borderStyle,
           child: child,
         );
       }
     }
 
-    List<Widget> resizeAreas = !widget.windowIsResizable || widget.windowState != WindowState.normal
+    List<Widget> resizeAreas = !widget.window.isResizable || widget.window.state != WindowState.normal
         ? []
         : [
             // Right
@@ -106,9 +129,9 @@ class _WindowWidgetState extends State<WindowWidget> {
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x + _dragOffset!.dx,
-                    widget.windowSize.y,
+                    widget.window.size.y,
                   ));
                 },
                 MouseRegion(
@@ -128,16 +151,16 @@ class _WindowWidgetState extends State<WindowWidget> {
               child: _resizeArea(
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
-                  bool sizeXIsMin = widget.windowMinSize.x >= oldWindowSize.x - _dragOffset!.dx;
+                  bool sizeXIsMin = widget.window.minSize.x >= oldWindowSize.x - _dragOffset!.dx;
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x - _dragOffset!.dx,
-                    widget.windowSize.y,
+                    widget.window.size.y,
                   ));
 
-                  widget.posCallback(Vector2(
+                  widget.window.setPos(Vector2(
                     oldWindowPos.x + (!sizeXIsMin ? _dragOffset!.dx : 0),
-                    widget.windowPos.y,
+                    widget.window.pos.y,
                   ));
                 },
                 MouseRegion(
@@ -157,15 +180,15 @@ class _WindowWidgetState extends State<WindowWidget> {
               child: _resizeArea(
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
-                  bool sizeYIsMin = widget.windowMinSize.y >= oldWindowSize.y - _dragOffset!.dy;
+                  bool sizeYIsMin = widget.window.minSize.y >= oldWindowSize.y - _dragOffset!.dy;
 
-                  widget.resizeCallback(Vector2(
-                    widget.windowSize.x,
+                  widget.window.setSize(Vector2(
+                    widget.window.size.x,
                     oldWindowSize.y - _dragOffset!.dy,
                   ));
 
-                  widget.posCallback(Vector2(
-                    widget.windowPos.x,
+                  widget.window.setPos(Vector2(
+                    widget.window.pos.x,
                     oldWindowPos.y + (!sizeYIsMin ? _dragOffset!.dy : 0),
                   ));
                 },
@@ -187,8 +210,8 @@ class _WindowWidgetState extends State<WindowWidget> {
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
 
-                  widget.resizeCallback(Vector2(
-                    widget.windowSize.x,
+                  widget.window.setSize(Vector2(
+                    widget.window.size.x,
                     oldWindowSize.y + _dragOffset!.dy,
                   ));
                 },
@@ -209,7 +232,7 @@ class _WindowWidgetState extends State<WindowWidget> {
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x + _dragOffset!.dx,
                     oldWindowSize.y + _dragOffset!.dy,
                   ));
@@ -231,16 +254,16 @@ class _WindowWidgetState extends State<WindowWidget> {
               child: _resizeArea(
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
-                  bool sizeXIsMin = widget.windowMinSize.x >= oldWindowSize.x - _dragOffset!.dx;
+                  bool sizeXIsMin = widget.window.minSize.x >= oldWindowSize.x - _dragOffset!.dx;
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x - _dragOffset!.dx,
                     oldWindowSize.y + _dragOffset!.dy,
                   ));
 
-                  widget.posCallback(Vector2(
+                  widget.window.setPos(Vector2(
                     oldWindowPos.x + (!sizeXIsMin ? _dragOffset!.dx : 0),
-                    widget.windowPos.y,
+                    widget.window.pos.y,
                   ));
                 },
                 const MouseRegion(
@@ -260,15 +283,15 @@ class _WindowWidgetState extends State<WindowWidget> {
               child: _resizeArea(
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
-                  bool sizeYIsMin = widget.windowMinSize.y >= oldWindowSize.y - _dragOffset!.dy;
+                  bool sizeYIsMin = widget.window.minSize.y >= oldWindowSize.y - _dragOffset!.dy;
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x + _dragOffset!.dx,
                     oldWindowSize.y - _dragOffset!.dy,
                   ));
 
-                  widget.posCallback(Vector2(
-                    widget.windowPos.x,
+                  widget.window.setPos(Vector2(
+                    widget.window.pos.x,
                     oldWindowPos.y + (!sizeYIsMin ? _dragOffset!.dy : 0),
                   ));
                 },
@@ -289,15 +312,15 @@ class _WindowWidgetState extends State<WindowWidget> {
               child: _resizeArea(
                 (p) {
                   _dragOffset = Offset(_dragOffset!.dx + p.delta.dx, _dragOffset!.dy + p.delta.dy);
-                  bool sizeXIsMin = widget.windowMinSize.x >= oldWindowSize.x - _dragOffset!.dx;
-                  bool sizeYIsMin = widget.windowMinSize.y >= oldWindowSize.y - _dragOffset!.dy;
+                  bool sizeXIsMin = widget.window.minSize.x >= oldWindowSize.x - _dragOffset!.dx;
+                  bool sizeYIsMin = widget.window.minSize.y >= oldWindowSize.y - _dragOffset!.dy;
 
-                  widget.resizeCallback(Vector2(
+                  widget.window.setSize(Vector2(
                     oldWindowSize.x - _dragOffset!.dx,
                     oldWindowSize.y - _dragOffset!.dy,
                   ));
 
-                  widget.posCallback(Vector2(
+                  widget.window.setPos(Vector2(
                     oldWindowPos.x + (!sizeXIsMin ? _dragOffset!.dx : 0),
                     oldWindowPos.y + (!sizeYIsMin ? _dragOffset!.dy : 0),
                   ));
@@ -317,14 +340,14 @@ class _WindowWidgetState extends State<WindowWidget> {
     return Stack(
       children: [
         Positioned(
-          top: widget.windowState == WindowState.normal ? kResizeAreaThickness : 0,
-          left: widget.windowState == WindowState.normal ? kResizeAreaThickness : 0,
-          bottom: widget.windowState == WindowState.normal ? kResizeAreaThickness : 0,
-          right: widget.windowState == WindowState.normal ? kResizeAreaThickness : 0,
+          top: widget.window.state == WindowState.normal ? kResizeAreaThickness : 0,
+          left: widget.window.state == WindowState.normal ? kResizeAreaThickness : 0,
+          bottom: widget.window.state == WindowState.normal ? kResizeAreaThickness : 0,
+          right: widget.window.state == WindowState.normal ? kResizeAreaThickness : 0,
           child: base(
             Column(
               children: [
-                header,
+                header(),
                 Expanded(child: widget.content),
               ],
             ),
@@ -340,8 +363,8 @@ class _WindowWidgetState extends State<WindowWidget> {
       onPointerMove: onPointerMove,
       onPointerDown: (p) {
         _dragOffset = Offset.zero;
-        oldWindowSize = widget.windowSize;
-        oldWindowPos = widget.windowPos;
+        oldWindowSize = widget.window.size;
+        oldWindowPos = widget.window.pos;
       },
       onPointerUp: (p) {
         _dragOffset = null;

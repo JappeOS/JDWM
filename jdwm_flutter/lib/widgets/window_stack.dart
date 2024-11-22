@@ -29,6 +29,14 @@ class WindowStack extends StatefulWidget {
 
 class _WindowStackState extends State<WindowStack> {
   @override
+  void dispose() {
+    for (var window in widget.wmController!.windows) {
+      window._dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: widget.insets,
@@ -78,49 +86,48 @@ class _WindowStackItemState extends State<_WindowStackItem> with TickerProviderS
     animController = AnimationController(vsync: this);
     animCurve = defaultAnimCurve;
     animDuration = defaultAnimDuration;
+    e.registerPreprocessor(_preprocessEvent);
   }
 
   @override
   void dispose() {
+    e.unregisterPreprocessor(_preprocessEvent);
     animController.dispose();
     super.dispose();
   }
 
-  void _handleResizeCallback(Vector2 size) {
-    if (animCurve != defaultAnimCurve) return;
-    e.setSize(size);
+  bool _preprocessEvent(WindowEvent<dynamic> event) {
+    switch (event.id) {
+      case "onSizeChanged":
+        return _handleResizeCallback();
+      case "onPosChanged":
+        return _handlePosCallback();
+      case "onStateChanged":
+        return _handleStateCallback();
+    }
+    return true;
   }
 
-  void _handlePosCallback(Vector2 pos) {
-    if (animCurve != defaultAnimCurve) return;
-    e.setPos(pos);
+  bool _handleResizeCallback() {
+    if (animCurve != defaultAnimCurve) return false;
+    return true;
   }
 
-  void _handleStateCallback(WindowState state) {
+  bool _handlePosCallback() {
+    if (animCurve != defaultAnimCurve) return false;
+    return true;
+  }
+
+  bool _handleStateCallback() {
     animCurve = Curves.easeInOut;
     animDuration = const Duration(milliseconds: 100);
-    e.setState(state);
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     WindowContent wcontent = WindowContent(key: wcontentKey, texture: e.render);
-
-    WindowWidget wgt = WindowWidget(
-      content: wcontent,
-      windowBackgroundMode: e.bgRenderMode,
-      windowIsFocused: e.isFocused,
-      windowIsResizable: e.isResizable,
-      windowPos: e.pos,
-      windowMinSize: e.minSize,
-      windowSize: e.size,
-      windowState: e.state,
-      focusCallback: e.setFocus,
-      resizeCallback: _handleResizeCallback,
-      posCallback: _handlePosCallback,
-      stateCallback: _handleStateCallback,
-      closeCallback: e._close,
-    );
+    WindowWidget wgt = WindowWidget(content: wcontent, window: e);
 
     return AnimatedBuilder(
       animation: animController,

@@ -44,6 +44,7 @@ class Window {
     onNewRender.unsubscribeAll();
 
     onEvent.unsubscribeAll();
+    _eventPreprocessors.clear();
   }
 
   final Key key = UniqueKey();
@@ -85,28 +86,28 @@ class Window {
 
   void setTitle(String title) {
     _title = title;
-    onTitleChanged.broadcast(WindowEvent._("onTitleChanged", this.title));
+    _broadcastEvent(onTitleChanged, WindowEvent._("onTitleChanged", this.title));
   }
 
   void setFocus(bool hasFocus) {
     _isFocused = hasFocus;
-    onFocusChanged.broadcast(WindowEvent._("onFocusChanged", isFocused));
+    _broadcastEvent(onFocusChanged, WindowEvent._("onFocusChanged", isFocused));
   }
 
   void setResizable(bool isResizable) {
     _isResizable = isResizable;
-    onResizableChanged.broadcast(WindowEvent._("onResizableChanged", this.isResizable));
+    _broadcastEvent(onResizableChanged, WindowEvent._("onResizableChanged", this.isResizable));
   }
 
   void setBgRenderMode(BackgroundMode mode) {
     _bgRenderMode = mode;
-    onBackgroundRenderModeChanged.broadcast(WindowEvent._("onBackgroundRenderModeChanged", bgRenderMode));
+    _broadcastEvent(onBackgroundRenderModeChanged, WindowEvent._("onBackgroundRenderModeChanged", bgRenderMode));
   }
 
   void setPos(Vector2 pos, [bool forceIgnoreState = false]) {
     if (!forceIgnoreState) setState(WindowState.normal);
     _pos = pos;
-    onPosChanged.broadcast(WindowEvent._("onPosChanged", this.pos));
+    _broadcastEvent(onPosChanged, WindowEvent._("onPosChanged", this.pos));
   }
 
   void setSize(Vector2 size, [bool forceSetSize = false, bool forceIgnoreState = false]) {
@@ -127,7 +128,7 @@ class Window {
     }
 
     _size = Vector2(x, y);
-    onSizeChanged.broadcast(WindowEvent._("onSizeChanged", this.size));
+    _broadcastEvent(onSizeChanged, WindowEvent._("onSizeChanged", this.size));
   }
 
   void setMinSize(Vector2 size) {
@@ -143,20 +144,45 @@ class Window {
     }
 
     _minSize = Vector2(x, y);
-    onMinSizeChanged.broadcast(WindowEvent._("onMinSizeChanged", minSize));
+    _broadcastEvent(onMinSizeChanged, WindowEvent._("onMinSizeChanged", minSize));
   }
 
   void setState(WindowState state) {
     _state = state;
-    onStateChanged.broadcast(WindowEvent._("onStateChanged", this.state));
+    _broadcastEvent(onStateChanged, WindowEvent._("onStateChanged", this.state));
   }
 
   void setRender(Uint8List tex) {
     _render = tex;
-    onNewRender.broadcast(WindowEvent._("onNewRender", render ?? Uint8List(0)));
+    _broadcastEvent(onNewRender, WindowEvent._("onNewRender", render ?? Uint8List(0)));
   }
 
   // Events
+
+  final List<bool Function(WindowEvent<dynamic>)> _eventPreprocessors = [];
+
+  /// Registers an event preprocessor on this window. Return false to cancel event, otherwisse true.
+  void registerPreprocessor(bool Function(WindowEvent<dynamic>) preprocessFn) {
+    _eventPreprocessors.add(preprocessFn);
+  }
+
+  /// Unregister a previously registered preprocessor.
+  void unregisterPreprocessor(bool Function(WindowEvent<dynamic>) preprocessFn) {
+    _eventPreprocessors.remove(preprocessFn);
+  }
+
+  void _broadcastEvent(Event eventObj, WindowEvent<dynamic> eventArgs) {
+    if (!_preprocessEvents(eventArgs)) return;
+    eventObj.broadcast(eventArgs);
+  }
+
+  bool _preprocessEvents(WindowEvent<dynamic> event) {
+    bool result = true;
+    for (int i = 0; i < _eventPreprocessors.length && result; i++) {
+      result = _eventPreprocessors[i](event);
+    }
+    return result;
+  }
 
   final onTitleChanged = Event<WindowEvent<String>>();
   final onFocusChanged = Event<WindowEvent<bool>>();

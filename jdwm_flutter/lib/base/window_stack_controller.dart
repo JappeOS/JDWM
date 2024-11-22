@@ -16,7 +16,7 @@
 
 part of jdwm_flutter;
 
-/// This class can be used to spawn a new window.
+/// This class can be used to create a new window.
 class WindowStackController {
   WindowStackController(this._onUpdate);
 
