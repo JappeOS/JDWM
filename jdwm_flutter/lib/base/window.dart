@@ -159,24 +159,24 @@ class Window {
 
   // Events
 
-  final List<bool Function(WindowEvent<dynamic>)> _eventPreprocessors = [];
+  final List<bool Function(WindowEvent)> _eventPreprocessors = [];
 
   /// Registers an event preprocessor on this window. Return false to cancel event, otherwisse true.
-  void registerPreprocessor(bool Function(WindowEvent<dynamic>) preprocessFn) {
+  void registerPreprocessor(bool Function(WindowEvent) preprocessFn) {
     _eventPreprocessors.add(preprocessFn);
   }
 
   /// Unregister a previously registered preprocessor.
-  void unregisterPreprocessor(bool Function(WindowEvent<dynamic>) preprocessFn) {
+  void unregisterPreprocessor(bool Function(WindowEvent) preprocessFn) {
     _eventPreprocessors.remove(preprocessFn);
   }
 
-  void _broadcastEvent(Event eventObj, WindowEvent<dynamic> eventArgs) {
+  void _broadcastEvent(Event eventObj, WindowEvent eventArgs) {
     if (!_preprocessEvents(eventArgs)) return;
     eventObj.broadcast(eventArgs);
   }
 
-  bool _preprocessEvents(WindowEvent<dynamic> event) {
+  bool _preprocessEvents(WindowEvent event) {
     bool result = true;
     for (int i = 0; i < _eventPreprocessors.length && result; i++) {
       result = _eventPreprocessors[i](event);
