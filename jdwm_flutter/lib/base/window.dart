@@ -171,7 +171,7 @@ class Window {
     _eventPreprocessors.remove(preprocessFn);
   }
 
-  void _broadcastEvent(Event eventObj, WindowEvent eventArgs) {
+  void _broadcastEvent<T>(Event<WindowEvent<T>> eventObj, WindowEvent<T> eventArgs) {
     if (!_preprocessEvents(eventArgs)) return;
     eventObj.broadcast(eventArgs);
   }
