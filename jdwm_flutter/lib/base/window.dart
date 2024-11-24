@@ -21,15 +21,15 @@ class Window {
   static final defaultMinWindowSize = Vector2(107, 37);
 
   Window._() {
-    onTitleChanged.subscribe((args) => onEvent.broadcast(args));
-    onFocusChanged.subscribe((args) => onEvent.broadcast(args));
-    onResizableChanged.subscribe((args) => onEvent.broadcast(args));
-    onBackgroundRenderModeChanged.subscribe((args) => onEvent.broadcast(args));
-    onPosChanged.subscribe((args) => onEvent.broadcast(args));
-    onSizeChanged.subscribe((args) => onEvent.broadcast(args));
-    onMinSizeChanged.subscribe((args) => onEvent.broadcast(args));
-    onStateChanged.subscribe((args) => onEvent.broadcast(args));
-    onNewRender.subscribe((args) => onEvent.broadcast(args));
+    onTitleChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onFocusChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onResizableChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onBackgroundRenderModeChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onPosChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onSizeChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onMinSizeChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onStateChanged.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
+    onNewRender.subscribe(PrioritizedEventHandler((args) => onEvent.broadcast(args)));
   }
 
   void _dispose() {
@@ -148,6 +148,7 @@ class Window {
   }
 
   void setState(WindowState state) {
+    if (_state == state) return;
     _state = state;
     _broadcastEvent(onStateChanged, WindowEvent._("onStateChanged", this.state));
   }
@@ -171,7 +172,7 @@ class Window {
     _eventPreprocessors.remove(preprocessFn);
   }
 
-  void _broadcastEvent<T>(Event<WindowEvent<T>> eventObj, WindowEvent<T> eventArgs) {
+  void _broadcastEvent<T>(PrioritizedEvent<WindowEvent<T>> eventObj, WindowEvent<T> eventArgs) {
     if (!_preprocessEvents(eventArgs)) return;
     eventObj.broadcast(eventArgs);
   }
@@ -184,17 +185,17 @@ class Window {
     return result;
   }
 
-  final onTitleChanged = Event<WindowEvent<String>>();
-  final onFocusChanged = Event<WindowEvent<bool>>();
-  final onResizableChanged = Event<WindowEvent<bool>>();
-  final onBackgroundRenderModeChanged = Event<WindowEvent<BackgroundMode>>();
-  final onPosChanged = Event<WindowEvent<Vector2>>();
-  final onSizeChanged = Event<WindowEvent<Vector2>>();
-  final onMinSizeChanged = Event<WindowEvent<Vector2>>();
-  final onStateChanged = Event<WindowEvent<WindowState>>();
-  final onNewRender = Event<WindowEvent<Uint8List>>();
+  final onTitleChanged = PrioritizedEvent<WindowEvent<String>>();
+  final onFocusChanged = PrioritizedEvent<WindowEvent<bool>>();
+  final onResizableChanged = PrioritizedEvent<WindowEvent<bool>>();
+  final onBackgroundRenderModeChanged = PrioritizedEvent<WindowEvent<BackgroundMode>>();
+  final onPosChanged = PrioritizedEvent<WindowEvent<Vector2>>();
+  final onSizeChanged = PrioritizedEvent<WindowEvent<Vector2>>();
+  final onMinSizeChanged = PrioritizedEvent<WindowEvent<Vector2>>();
+  final onStateChanged = PrioritizedEvent<WindowEvent<WindowState>>();
+  final onNewRender = PrioritizedEvent<WindowEvent<Uint8List>>();
 
-  final onEvent = Event<WindowEvent>();
+  final onEvent = PrioritizedEvent<WindowEvent>();
 }
 
 enum WindowState { normal, maximized, minimized }

@@ -20,6 +20,7 @@ import 'dart:typed_data';
 
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
+import 'package:prioritized_event/prioritized_event.dart';
 import 'package:shade_ui/shade_ui.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 

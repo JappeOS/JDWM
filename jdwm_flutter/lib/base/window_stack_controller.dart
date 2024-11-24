@@ -54,7 +54,14 @@ class WindowStackController {
       _onUpdate();
     }
 
+    // Init onSizeChanged.
+    void onSizeChangedEvent(WindowEvent<Vector2>? val) {
+      _onUpdate();
+    }
+
     // Init onStateChanged.
+    // NOTE: Events like setPos and setSize will be cancelled by preprocessors in [_WindowStackItemState]
+    // while the state is changing. Because of this, we call _onUpdate() in the end of this function.
     void onStateChangedEvent(WindowEvent<WindowState>? val) {
       if (val!.value != WindowState.normal) {
         normalStatePos = window.pos;
@@ -76,20 +83,21 @@ class WindowStackController {
       }
 
       previousState = val.value;
+      _onUpdate();
     }
 
     // Subscribe to events
-    window.onFocusChanged.subscribe(onFocusChangedEvent);
-    window.onPosChanged.subscribe(onPosChangedEvent);
-    window.onSizeChanged.subscribe(onPosChangedEvent);
-    window.onStateChanged.subscribe(onStateChangedEvent);
+    window.onFocusChanged.subscribe(PrioritizedEventHandler(onFocusChangedEvent, EventPriority.lowest.value));
+    window.onPosChanged.subscribe(PrioritizedEventHandler(onPosChangedEvent, EventPriority.lowest.value));
+    window.onSizeChanged.subscribe(PrioritizedEventHandler(onSizeChangedEvent, EventPriority.lowest.value));
+    window.onStateChanged.subscribe(PrioritizedEventHandler(onStateChangedEvent));
 
     // Close callback
     window._close = () {
       // Unsubscribe from events
       window.onFocusChanged.unsubscribe(onFocusChangedEvent);
       window.onPosChanged.unsubscribe(onPosChangedEvent);
-      window.onSizeChanged.unsubscribe(onPosChangedEvent);
+      window.onPosChanged.unsubscribe(onSizeChangedEvent);
       window.onStateChanged.unsubscribe(onStateChangedEvent);
 
       // Remove window and rebuild widget tree.

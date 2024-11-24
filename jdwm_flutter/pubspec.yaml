@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
+  sdk: ^3.5.4
 
 dependencies:
   flutter:
@@ -15,12 +15,17 @@ dependencies:
       url: https://github.com/Jappe-OS/shade_ui.git
       ref: master-2.0
 
+  prioritized_event:
+    git:
+      url: https://github.com/JappeOS/prioritized_event.git
+      ref: main
+
   vector_math: ^2.1.4
-  event: ^2.1.2
+  event: ^3.1.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  #flutter_test:
+  #  sdk: flutter
 
   flutter_lints: ^2.0.0
 

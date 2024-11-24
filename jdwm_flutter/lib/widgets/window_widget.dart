@@ -40,15 +40,6 @@ class _WindowWidgetState extends State<WindowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    //WindowHeader header = WindowHeader(
-    //    maximizeButton: widget.windowIsResizable,
-    //    windowPos: widget.windowPos,
-    //    windowState: widget.windowState,
-    //    focusCallback: widget.focusCallback,
-    //    posCallback: widget.posCallback,
-    //    stateCallback: widget.stateCallback,
-    //    closeCallback: widget.closeCallback);
-
     Widget header() => ShadeHeaderBar(
       title: widget.window.title,
       backgroundColor: Colors.transparent,
