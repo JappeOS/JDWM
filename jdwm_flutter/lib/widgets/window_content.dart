@@ -16,8 +16,9 @@
 
 part of jdwm_flutter;
 
+// TODO: Make stateless
 class WindowContent extends StatefulWidget {
-  final Uint8List? texture;
+  final int? texture;
 
   const WindowContent({Key? key, this.texture}) : super(key: key);
 
@@ -28,6 +29,6 @@ class WindowContent extends StatefulWidget {
 class _WindowContentState extends State<WindowContent> {
   @override
   Widget build(BuildContext context) {
-    return widget.texture != null ? Image.memory(widget.texture!, fit: BoxFit.fill) : const Placeholder();
+    return widget.texture != null ? Texture(textureId: widget.texture!) : const SizedBox.shrink();
   }
 }
