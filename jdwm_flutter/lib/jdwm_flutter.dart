@@ -1,5 +1,5 @@
 //  jdwm_flutter, The Flutter UI library for the JDWM window manager.
-//  Copyright (C) 2024  The JappeOS team.
+//  Copyright (C) 2025  The JappeOS team.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as

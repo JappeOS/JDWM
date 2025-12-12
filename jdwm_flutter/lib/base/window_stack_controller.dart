@@ -1,5 +1,5 @@
 //  jdwm_flutter, The Flutter UI library for the JDWM window manager.
-//  Copyright (C) 2024  The JappeOS team.
+//  Copyright (C) 2025  The JappeOS team.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as
@@ -17,17 +17,29 @@
 part of jdwm_flutter;
 
 class WindowStackController {
-  final GlobalKey<WindowNavigatorHandle> navigatorKey;
+  late final GlobalKey<WindowNavigatorHandle> _navigatorKey;
+  bool _initialized = false;
 
-  WindowStackController({required this.navigatorKey});
+  WindowStackController();
 
   // List of windows.
   final List<WindowController> _windows = [];
   List<WindowController> get windows => _windows;
 
+  void init(GlobalKey<WindowNavigatorHandle> navigatorKey) {
+    if (_initialized) return;
+    _navigatorKey = navigatorKey;
+    _initialized = true;
+  }
+
   WindowController createWindow() {
     final controller = WindowController(bounds: const Rect.fromLTWH(0, 0, 300, 300));
-    navigatorKey.currentState?.pushWindow(Window.controlled(controller: controller));
+    _navigatorKey.currentState?.pushWindow(Window(
+                bounds: const Rect.fromLTWH(0, 0, 200, 200),
+                title: Text(
+                    'Window ${_navigatorKey.currentState!.windows.length + 1}'),
+                content: const Text("Hello World"),
+              ),);
     _windows.add(controller);
     return controller;
   }
