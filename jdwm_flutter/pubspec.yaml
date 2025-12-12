@@ -9,10 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  shade_ui:
+    
+  shadcn_flutter:
     git:
-      url: https://github.com/JappeOS/shade_ui.git
+      url: https://github.com/JappeOS/shadcn_flutter.git
       ref: master
 
   prioritized_event:

@@ -25,6 +25,6 @@ class WindowStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WindowNavigator(key: wmController?.navigatorKey, initialWindows: const []);
+    return Padding(padding: insets, child: WindowNavigator(key: wmController?.navigatorKey, initialWindows: const []));
   }
 }
