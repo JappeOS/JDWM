@@ -23,8 +23,10 @@ class WindowStackController {
   WindowStackController();
 
   // List of windows.
-  final List<WindowController> _windows = [];
-  List<WindowController> get windows => _windows;
+  final List<Window> _windows = [];
+  List<Window> get windows => _navigatorKey.currentState != null
+      ? _navigatorKey.currentState!.windows
+      : [];
 
   void init(GlobalKey<WindowNavigatorHandle> navigatorKey) {
     if (_initialized) return;
@@ -32,15 +34,14 @@ class WindowStackController {
     _initialized = true;
   }
 
-  WindowController createWindow() {
-    final controller = WindowController(bounds: const Rect.fromLTWH(0, 0, 300, 300));
-    _navigatorKey.currentState?.pushWindow(Window(
-                bounds: const Rect.fromLTWH(0, 0, 200, 200),
-                title: Text(
-                    'Window ${_navigatorKey.currentState!.windows.length + 1}'),
-                content: const Text("Hello World"),
-              ),);
-    _windows.add(controller);
-    return controller;
+  void createWindow() {
+    final window = Window(
+      bounds: const Rect.fromLTWH(0, 0, 200, 200),
+      title: Text(
+          'Window ${_navigatorKey.currentState!.windows.length + 1}'),
+      content: const Text("Hello World"),
+    );
+    _navigatorKey.currentState?.pushWindow(window);
+    _windows.add(window);
   }
 }
