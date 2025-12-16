@@ -77,10 +77,10 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-      sha256: "7caf6a750a0c04effbb52a676dce9a4a592e10ad35c34d6d2d0e4811160d5670"
+      sha256: "701dcfc06da0882883a2657c445103380e53e647060ad8d9dfb710c100996608"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.4+2"
+    version: "0.3.5+1"
   data_widget:
     dependency: transitive
     description:
@@ -109,10 +109,10 @@ packages:
     dependency: transitive
     description:
       name: expressions
-      sha256: "308a621b602923dd8a0cf3072793b24850d06453eb49c6b698cbda41a282e904"
+      sha256: f3b0e99563a9a1bde1138e728eb722f292cc7d2aec55d28136c49b1a370306c5
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.5+2"
+    version: "0.2.5+3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -148,10 +148,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "1.6.0"
   http_parser:
     dependency: transitive
     description:
@@ -180,10 +180,10 @@ packages:
     dependency: transitive
     description:
       name: jovial_svg
-      sha256: "6791b1435547bdc0793081a166d41a8a313ebc61e4e5136fb7a3218781fb9e50"
+      sha256: "08dd24b800d48796c9c0227acb96eb00c6cacccb1d7de58d79fc924090049868"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.27"
+    version: "1.1.28"
   json_annotation:
     dependency: transitive
     description:
@@ -204,10 +204,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: dc58c723c3c24bf8d3e2d3ad3f2f9d7bd9cf43ec6feaa64181775e60190153f2
+      sha256: "12956d0ad8390bbcc63ca2e1469c0619946ccb52809807067a7020d57e647aa6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.17"
+    version: "0.12.18"
   material_color_utilities:
     dependency: transitive
     description:
@@ -236,10 +236,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "07c8f0b1913bcde1ff0d26e57ace2f3012ccbf2b204e070290dad3bb22797646"
+      sha256: "1a97266a94f7350d30ae522c0af07890c70b8e62c71e8e3920d1db4d23c057d1"
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.0"
+    version: "7.0.1"
   phonecodes:
     dependency: transitive
     description:
@@ -324,20 +324,18 @@ packages:
   shadcn_flutter:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: a1b09d8bbc2da23a652567e0a9fb9f76e443948a
-      url: "https://github.com/JappeOS/shadcn_flutter.git"
-    source: git
+      path: "../../shadcn_flutter"
+      relative: true
+    source: path
     version: "0.0.48"
   skeletonizer:
     dependency: transitive
     description:
       name: skeletonizer
-      sha256: eebc03dc86b298e2d7f61e0ebce5713e9dbbc3e786f825909b4591756f196eb6
+      sha256: "5d2d44120916cc749ede54c236cef60c2478742806df0b1f065212f00721b185"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0+1"
+    version: "2.1.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -387,10 +385,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
+      sha256: "19a78f63e83d3a61f00826d09bc2f60e191bf3504183c001262be6ac75589fb8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.7"
+    version: "0.7.8"
   typed_data:
     dependency: transitive
     description:
@@ -427,10 +425,10 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
+      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.0"
+    version: "6.6.1"
   yaru_window:
     dependency: transitive
     description:
@@ -472,5 +470,5 @@ packages:
     source: hosted
     version: "0.0.4"
 sdks:
-  dart: ">=3.8.0-0 <4.0.0"
+  dart: ">=3.8.0 <4.0.0"
   flutter: ">=3.32.3"

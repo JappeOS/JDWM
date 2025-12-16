@@ -16,24 +16,28 @@
 
 part of jdwm_flutter;
 
+/// Controller to manage the window stack.
 class WindowStackController {
   late final GlobalKey<WindowNavigatorHandle> _navigatorKey;
   bool _initialized = false;
+  final List<Window> _windows = [];
 
+  /// Creates a [WindowStackController].
   WindowStackController();
 
-  // List of windows.
-  final List<Window> _windows = [];
+  /// List of windows.
   List<Window> get windows => _navigatorKey.currentState != null
       ? _navigatorKey.currentState!.windows
       : [];
 
+  /// Initializes the controller with the given navigator key.
   void init(GlobalKey<WindowNavigatorHandle> navigatorKey) {
     if (_initialized) return;
     _navigatorKey = navigatorKey;
     _initialized = true;
   }
 
+  /// Creates a new window and adds it to the stack.
   void createWindow() {
     final window = Window(
       bounds: const Rect.fromLTWH(0, 0, 200, 200),

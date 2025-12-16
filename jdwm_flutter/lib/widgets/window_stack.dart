@@ -17,23 +17,21 @@
 part of jdwm_flutter;
 
 /// A widget to manage windows.
-/*class WindowStack extends StatelessWidget {
-  final WindowStackController wmController;
-  final EdgeInsetsGeometry insets;
-
-  const WindowStack({Key? key, required this.wmController, this.insets = EdgeInsets.zero}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(padding: insets, child: WindowNavigator(key: wmController._navigatorKey, initialWindows: const []));
-  }
-}*/
-
 class WindowStack extends StatefulWidget {
+  /// The controller to manage the window stack.
   final WindowStackController wmController;
-  final EdgeInsetsGeometry insets;
 
-  const WindowStack({super.key, required this.wmController, this.insets = EdgeInsets.zero});
+  /// Padding to apply when `monitors` is null.
+  final EdgeInsetsGeometry dynamicMonitorInsets;
+
+  /// The list of monitors to use. If null, the widget will use a single "dynamic" monitor that fills the available space.
+  final List<Monitor>? monitors;
+
+  /// The index of the primary monitor in the `monitors` list. Defaults to 0.
+  final int primaryMonitorIndex;
+
+  /// Creates a [WindowStack] widget.
+  const WindowStack({super.key, required this.wmController, this.dynamicMonitorInsets = EdgeInsets.zero, this.monitors, this.primaryMonitorIndex = 0});
 
   @override
   State<WindowStack> createState() => _WindowStackState();
@@ -50,12 +48,21 @@ class _WindowStackState extends State<WindowStack> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: widget.insets,
-      child: WindowNavigator(
-        key: _navigatorKey,
-        initialWindows: const [],
-      ),
+    final navigator = WindowNavigator(
+      key: _navigatorKey,
+      initialWindows: const [],
+      monitors: widget.monitors,
+      primaryMonitorId: widget.primaryMonitorIndex,
+      showTopSnapBar: false,
     );
+
+    if (widget.monitors != null) {
+      return navigator;
+    } else {
+      return Padding(
+        padding: widget.dynamicMonitorInsets,
+        child: navigator,
+      );
+    }
   }
 }
